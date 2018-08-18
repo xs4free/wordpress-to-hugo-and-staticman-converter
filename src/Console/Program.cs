@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using System;
+using ConverterLibrary;
 
 namespace wordpress_to_hugo_and_staticman_converter
 {
@@ -10,8 +10,8 @@ namespace wordpress_to_hugo_and_staticman_converter
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
-                    Console.WriteLine($"Start processing '{o.Input}'...");
-                    Console.WriteLine("Done.");
+                    var converter = new WordpressToHugoConverter(o.Input);
+                    converter.Convert();
                 });
         }
     }
