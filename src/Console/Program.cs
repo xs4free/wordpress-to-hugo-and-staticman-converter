@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using CommandLine;
-using ConverterLibrary;
-using System.IO;
+﻿using CommandLine;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace wordpress_to_hugo_and_staticman_converter
 {
@@ -12,23 +10,18 @@ namespace wordpress_to_hugo_and_staticman_converter
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
-                    IMapper mapper = CreateMapper();
-                    var converterOptions = mapper.Map<ConverterOptions>(o);
+                    var serviceProvider = ServiceProviderFactory.Create();
+                    var runner = serviceProvider.GetRequiredService<Runner>();
 
-                    var converter = new WordpressToHugoConverter();
-                    converter.Convert(converterOptions);
+                    try
+                    {
+                        runner.Run(o);
+                    }
+                    finally
+                    {
+                        NLog.LogManager.Shutdown();
+                    }
                 });
-        }
-
-        private static IMapper CreateMapper()
-        {
-            var config = new MapperConfiguration(cfg => 
-                cfg.CreateMap<Options, ConverterOptions>()
-                    .ForMember(dest => dest.InputFile, opt => opt.MapFrom(src => Path.GetFullPath(src.InputFile)))
-                    .ForMember(dest => dest.OutputDirectory, opt => opt.MapFrom(src => Path.GetFullPath(src.OutputDirectory)))
-                );
-            var mapper = config.CreateMapper();
-            return mapper;
         }
     }
 }

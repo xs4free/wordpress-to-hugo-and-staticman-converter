@@ -1,35 +1,43 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace ConverterLibrary
 {
     public class WordpressToHugoConverter
     {
+        private readonly ILogger<WordpressToHugoConverter> logger;
         private ConverterOptions options;
-        private ConverterOutput output;
 
-        public ConverterOutput Convert(ConverterOptions options)
+        public WordpressToHugoConverter(ILogger<WordpressToHugoConverter> logger)
         {
-            this.options = options;
-            output = new ConverterOutput();
-
-            Directory.CreateDirectory(options.OutputDirectory);
-            Console.WriteLine($"Output will be written to: '{options.OutputDirectory}'.");
-
-            ValidateOptions(options);
-
-            Console.WriteLine($"Start processing '{options.InputFile}'...");
-            Console.WriteLine("Done.");
-
-            return output;
+            this.logger = logger;
         }
 
-        private void ValidateOptions(ConverterOptions options)
+        public void Convert(ConverterOptions options)
         {
+            this.options = options;
+
+            Directory.CreateDirectory(options.OutputDirectory);
+            logger.LogInformation($"Output will be written to: '{options.OutputDirectory}'.");
+
+            if (ValidateOptions(options))
+            {
+                logger.LogInformation($"Start processing '{options.InputFile}'...");
+                logger.LogInformation("Done.");
+            }
+        }
+
+        private bool ValidateOptions(ConverterOptions options)
+        {
+            bool result = true;
+
             if (!File.Exists(options.InputFile))
             {
-                throw new Exception($"Input file '{options.InputFile}' not found.");
+                logger.LogError($"Input file '{options.InputFile}' not found.");
+                result = false;
             }
+
+            return result;
         }
     }
 }
