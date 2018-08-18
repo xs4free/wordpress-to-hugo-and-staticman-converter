@@ -14,8 +14,9 @@ namespace wordpress_to_hugo_and_staticman_converter
                 {
                     IMapper mapper = CreateMapper();
                     var converterOptions = mapper.Map<ConverterOptions>(o);
-                    var converter = new WordpressToHugoConverter(converterOptions);
-                    converter.Convert();
+
+                    var converter = new WordpressToHugoConverter();
+                    converter.Convert(converterOptions);
                 });
         }
 

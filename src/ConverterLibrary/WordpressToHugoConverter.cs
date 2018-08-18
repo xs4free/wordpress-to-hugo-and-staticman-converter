@@ -1,21 +1,35 @@
 ﻿using System;
+using System.IO;
 
 namespace ConverterLibrary
 {
     public class WordpressToHugoConverter
     {
-        private readonly ConverterOptions options;
+        private ConverterOptions options;
+        private ConverterOutput output;
 
-        public WordpressToHugoConverter(ConverterOptions options)
+        public ConverterOutput Convert(ConverterOptions options)
         {
             this.options = options;
-        }
+            output = new ConverterOutput();
 
-        public void Convert()
-        {
-            Console.WriteLine($"Output will be written to: '{options.OutputDirectory}'...");
+            Directory.CreateDirectory(options.OutputDirectory);
+            Console.WriteLine($"Output will be written to: '{options.OutputDirectory}'.");
+
+            ValidateOptions(options);
+
             Console.WriteLine($"Start processing '{options.InputFile}'...");
             Console.WriteLine("Done.");
+
+            return output;
+        }
+
+        private void ValidateOptions(ConverterOptions options)
+        {
+            if (!File.Exists(options.InputFile))
+            {
+                throw new Exception($"Input file '{options.InputFile}' not found.");
+            }
         }
     }
 }
