@@ -1,7 +1,8 @@
 ﻿namespace ConverterLibrary
 {
-    class ConverterOptions
+    public class ConverterOptions
     {
-        public string Input { get; set; }
+        public string InputFile { get; set; }
+        public string OutputDirectory { get; set; }
     }
 }

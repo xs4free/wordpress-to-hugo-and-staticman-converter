@@ -4,16 +4,17 @@ namespace ConverterLibrary
 {
     public class WordpressToHugoConverter
     {
-        private readonly string inputFile;
+        private readonly ConverterOptions options;
 
-        public WordpressToHugoConverter(string inputFile)
+        public WordpressToHugoConverter(ConverterOptions options)
         {
-            this.inputFile = inputFile;
+            this.options = options;
         }
 
         public void Convert()
         {
-            Console.WriteLine($"Start processing '{inputFile}'...");
+            Console.WriteLine($"Output will be written to: '{options.OutputDirectory}'...");
+            Console.WriteLine($"Start processing '{options.InputFile}'...");
             Console.WriteLine("Done.");
         }
     }
