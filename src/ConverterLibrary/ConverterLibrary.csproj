@@ -8,4 +8,8 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="1.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WordpressWXR12\WordpressWXR12.csproj" />
+  </ItemGroup>
+
 </Project>
