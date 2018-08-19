@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Property with XmlElement-attribute</Title>
+      <Author>Rogier Reedijk</Author>
+      <Description>Add a property to a class and decorate the property with an XmlElement attribute</Description>
+      <Shortcut>propxe</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="csharp">
+        <![CDATA[[XmlElement(ElementName = "$elementName$")]
+        public $type$ $PropertyName$ { get; set; }]]>
+      </Code>
+      <Imports>
+        <Import>
+          <Namespace>System.Xml.Serialization</Namespace>
+        </Import>
+      </Imports>
+      <Declarations>
+        <Literal>
+          <ID>elementName</ID>
+          <ToolTip>Replace with the name of the element in XML.</ToolTip>
+          <Default>elementName</Default>
+        </Literal>
+        <Literal>
+          <ID>type</ID>
+          <ToolTip>Replace with the type of the property.</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>PropertyName</ID>
+          <ToolTip>Replace with the name of the property.</ToolTip>
+          <Default>PropertyName</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
