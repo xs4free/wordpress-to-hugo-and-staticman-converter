@@ -5,6 +5,7 @@
 
 # wordpress-to-hugo-and-staticman specific
 TestData/
+Output/
 
 # User-specific files
 *.suo

@@ -6,9 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="NLog.Extensions.Logging" Version="1.2.1" />
+    <PackageReference Include="YamlDotNet" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HugoModels\HugoModels.csproj" />
     <ProjectReference Include="..\WordpressWXR12\WordpressWXR12.csproj" />
   </ItemGroup>
 

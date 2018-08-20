@@ -1,6 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HugoModels;
+using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Linq;
+using System.Text;
 using WordpressWXR12;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace ConverterLibrary
 {
@@ -25,10 +30,32 @@ namespace ConverterLibrary
             {
                 logger.LogInformation($"Start processing '{options.InputFile}'...");
                 var content = ReadWordpressExportFile(options.InputFile);
-                logger.LogInformation(content.Channel.WxrVersion);
+
+                WriteConfig(content, options);
+
+                var posts = content.Channel.Items.Where(item => item.PostType == "post" || item.PostType == "page").ToList();
+                logger.LogInformation($"Found {posts.Count} posts/pages.");
 
                 logger.LogInformation("Done.");
             }
+        }
+
+        private void WriteConfig(RSS content, ConverterOptions options)
+        {
+            var config = new Config();
+            config.Name = content.Channel.Title;
+            config.Description = content.Channel.Description;
+            config.Url = content.Channel.Link;
+
+            var serializer = new SerializerBuilder()
+                .WithNamingConvention(new CamelCaseNamingConvention())
+                .Build();
+            var yaml = serializer.Serialize(config);
+
+            string configFileName = Path.Combine(options.OutputDirectory, "config.yaml");
+            File.WriteAllText(configFileName, yaml, Encoding.UTF8);
+
+            logger.LogInformation($"Written '{configFileName}'.");
         }
 
         private RSS ReadWordpressExportFile(string inputFile)
