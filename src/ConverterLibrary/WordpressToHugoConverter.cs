@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.IO;
-using System.Xml.Serialization;
 using WordpressWXR12;
 
 namespace ConverterLibrary
@@ -34,11 +33,8 @@ namespace ConverterLibrary
 
         private RSS ReadWordpressExportFile(string inputFile)
         {
-            XmlSerializer ser = new XmlSerializer(typeof(RSS));
-            using (FileStream myFileStream = new FileStream(inputFile, FileMode.Open))
-            {
-                return (RSS)ser.Deserialize(myFileStream);
-            }
+            var parser = new WordpressWXRParser();
+            return parser.LoadFromFile(inputFile);
         }
 
         private bool ValidateOptions(ConverterOptions options)
