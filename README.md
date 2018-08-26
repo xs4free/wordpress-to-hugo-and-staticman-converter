@@ -6,8 +6,11 @@ Based my code on [wordpress-to-hugo-exporter][5] from [Cyrill Schumacher][6] whi
 Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-mail Notifications][7] by [Dan C Williams][8]. 
 
 # TODO
+- [ ] Add AppVeyor build tag
 - [ ] Write comments to own file
 - [ ] Parse gallery-tag in post-content
+- [ ] Improve WordpressWXR12 library with enums for field values
+- [ ] Extract WordpressWXR12 library into it's own library and NuGet-package
 - [ ] Validate images referenced in posts are presents in static content folder
 
 [1]: https://wordpress.com/
