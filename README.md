@@ -1,12 +1,13 @@
 # wordpress-to-hugo-and-staticman-converter
 Convert a [Wordpress][1] [xml export][2] to [Hugo][3] posts and [Staticman][4] comment-files.
+[![Build status](https://ci.appveyor.com/api/projects/status/pyrjhl3ltq4e4owd?svg=true)](https://ci.appveyor.com/project/xs4free/wordpress-to-hugo-and-staticman-converter)
 
 # Credits
 Based my code on [wordpress-to-hugo-exporter][5] from [Cyrill Schumacher][6] which is a Wordpress plugin (php) to export posts to Hugo files.
 Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-mail Notifications][7] by [Dan C Williams][8]. 
 
 # TODO
-- [ ] Add AppVeyor build tag
+- [x] Add AppVeyor build tag
 - [ ] Write comments to own file
 - [ ] Parse gallery-tag in post-content
 - [ ] Improve WordpressWXR12 library with enums for field values
