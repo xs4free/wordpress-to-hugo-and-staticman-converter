@@ -6,7 +6,6 @@ using System.Text;
 using AutoMapper;
 using WordpressWXR12;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace ConverterLibrary
 {
@@ -14,11 +13,13 @@ namespace ConverterLibrary
     {
         private readonly ILogger<WordpressToHugoConverter> _logger;
         private readonly IMapper _mapper;
+        private readonly Serializer _yamlSerializer;
 
-        public WordpressToHugoConverter(ILogger<WordpressToHugoConverter> logger, IMapper mapper)
+        public WordpressToHugoConverter(ILogger<WordpressToHugoConverter> logger, IMapper mapper, Serializer yamlSerializer)
         {
             _logger = logger;
             _mapper = mapper;
+            _yamlSerializer = yamlSerializer;
         }
 
         public void Convert(ConverterOptions options)
@@ -66,7 +67,7 @@ namespace ConverterLibrary
                     fileName = Path.Combine(options.OutputDirectory, hugoPost.Filename);
                 }
 
-                var yaml = SerializeToYaml(hugoPost.Metadata);
+                var yaml = _yamlSerializer.Serialize(hugoPost.Metadata);
 
                 StringBuilder hugoYaml = new StringBuilder();
                 hugoYaml.AppendLine("---");
@@ -89,20 +90,12 @@ namespace ConverterLibrary
             };
 
             string fileName = Path.Combine(options.OutputDirectory, "config.yaml");
-            var yaml = SerializeToYaml(config);
+            var yaml = _yamlSerializer.Serialize(config);
 
             File.WriteAllText(fileName, yaml, Encoding.UTF8);
             _logger.LogInformation($"Written '{fileName}'.");
         }
 
-        private static string SerializeToYaml<T>(T objectToWrite)
-        {
-            var serializer = new SerializerBuilder()
-                .WithNamingConvention(new CamelCaseNamingConvention())
-                .Build();
-            var yaml = serializer.Serialize(objectToWrite);
-            return yaml;
-        }
 
         private RSS ReadWordpressExportFile(string inputFile)
         {

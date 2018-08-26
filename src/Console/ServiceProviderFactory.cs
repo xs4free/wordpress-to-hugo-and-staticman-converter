@@ -19,7 +19,8 @@ namespace wordpress_to_hugo_and_staticman_converter
             services.AddAutoMapper();
             services.AddSingleton<ILoggerFactory, LoggerFactory>();
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-            services.AddLogging((builder) => builder.SetMinimumLevel(LogLevel.Trace));
+            services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace));
+            services.AddConverterLibrary();
 
             var serviceProvider = services.BuildServiceProvider();
 
