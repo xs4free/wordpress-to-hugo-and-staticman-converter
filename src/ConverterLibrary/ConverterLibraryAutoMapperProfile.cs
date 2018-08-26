@@ -35,9 +35,14 @@ namespace ConverterLibrary
 
             CreateMap<Item, Post>()
                 .ForMember(post => post.Filename, opt => opt.MapFrom(item => GetFileName(item)))
-                .ForMember(post => post.Metadata, opt => opt.MapFrom(item => item));
+                .ForMember(post => post.Metadata, opt => opt.MapFrom(item => item))
+                .ForMember(post => post.Content, opt => opt.MapFrom(item => GetContent(item)));
         }
 
+        private string GetContent(Item item)
+        {
+            return item.Content; //TODO: parse gallery-tag from content "[gallery type="rectangular" size="medium" ids="864,865,867,868,874,870,871,872,873"]"
+        }
 
         private string GetDate(Item wordpressPost)
         {

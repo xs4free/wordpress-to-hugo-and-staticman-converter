@@ -5,6 +5,11 @@ Convert a [Wordpress][1] [xml export][2] to [Hugo][3] posts and [Staticman][4] c
 Based my code on [wordpress-to-hugo-exporter][5] from [Cyrill Schumacher][6] which is a Wordpress plugin (php) to export posts to Hugo files.
 Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-mail Notifications][7] by [Dan C Williams][8]. 
 
+# TODO
+- [ ] Write comments to own file
+- [ ] Parse gallery-tag in post-content
+- [ ] Validate images referenced in posts are presents in static content folder
+
 [1]: https://wordpress.com/
 [2]: https://en.support.wordpress.com/export/
 [3]: https://gohugo.io/
