@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using WordpressWXR12;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -15,6 +16,7 @@ namespace ConverterLibrary
             }
 
             services.AddSingleton<Serializer>(GetYamlSerializer());
+            services.AddSingleton<IWordpressWXRParser>(new WordpressWXRParser());
 
             return services;
         }

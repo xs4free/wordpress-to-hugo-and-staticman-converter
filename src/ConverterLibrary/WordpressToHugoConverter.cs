@@ -14,12 +14,18 @@ namespace ConverterLibrary
         private readonly ILogger<WordpressToHugoConverter> _logger;
         private readonly IMapper _mapper;
         private readonly Serializer _yamlSerializer;
+        private readonly IWordpressWXRParser _parser;
 
-        public WordpressToHugoConverter(ILogger<WordpressToHugoConverter> logger, IMapper mapper, Serializer yamlSerializer)
+        public WordpressToHugoConverter(
+            ILogger<WordpressToHugoConverter> logger, 
+            IMapper mapper, 
+            Serializer yamlSerializer, 
+            IWordpressWXRParser parser)
         {
             _logger = logger;
             _mapper = mapper;
             _yamlSerializer = yamlSerializer;
+            _parser = parser;
         }
 
         public void Convert(ConverterOptions options)
@@ -30,7 +36,7 @@ namespace ConverterLibrary
             if (ValidateOptions(options))
             {
                 _logger.LogInformation($"Start processing '{options.InputFile}'...");
-                var content = ReadWordpressExportFile(options.InputFile);
+                var content = _parser.LoadFromFile(options.InputFile);
 
                 WriteConfig(content, options);
                 WritePosts(content, options);
@@ -94,13 +100,6 @@ namespace ConverterLibrary
 
             File.WriteAllText(fileName, yaml, Encoding.UTF8);
             _logger.LogInformation($"Written '{fileName}'.");
-        }
-
-
-        private RSS ReadWordpressExportFile(string inputFile)
-        {
-            var parser = new WordpressWXRParser();
-            return parser.LoadFromFile(inputFile);
         }
 
         private bool ValidateOptions(ConverterOptions options)

@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace WordpressWXR12
 {
-    public class WordpressWXRParser
+    public class WordpressWXRParser : IWordpressWXRParser
     {
         public RSS LoadFromFile(string fileName)
         {
