@@ -71,5 +71,8 @@ namespace WordpressWXR12
 
         [XmlElement(ElementName = "postmeta", Namespace = Namespaces.WP)]
         public PostMeta[] PostMetas { get; set; }
+
+        [XmlElement(ElementName = "comment", Namespace = Namespaces.WP)]
+        public Comment[] Comments { get; set; }
     }
 }
