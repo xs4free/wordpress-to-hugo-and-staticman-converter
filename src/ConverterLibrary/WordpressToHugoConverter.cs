@@ -1,4 +1,5 @@
-﻿using HugoModels;
+﻿using System.Collections.Generic;
+using HugoModels;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Linq;
@@ -40,6 +41,7 @@ namespace ConverterLibrary
 
                 WriteConfig(content, options);
                 WritePosts(content, options);
+                WriteComments(content, options);
 
                 _logger.LogInformation("Done.");
             }
@@ -82,6 +84,33 @@ namespace ConverterLibrary
                 hugoYaml.AppendLine(hugoPost.Content);
 
                 File.WriteAllText(fileName, hugoYaml.ToString(), Encoding.UTF8);
+                _logger.LogInformation($"Written '{fileName}'.");
+            }
+        }
+
+        private void WriteComments(RSS content, ConverterOptions options)
+        {
+            var posts = content.Channel.Items.Where(item => item.PostType == "post" || item.PostType == "page").ToList();
+            var staticmanComments = posts.SelectMany(post => _mapper.Map<IEnumerable<HugoModels.Comment>>(post));
+
+            var commentsDirectory = Directory.CreateDirectory(Path.Combine(options.OutputDirectory, "data\\comments"));
+            foreach (var comment in staticmanComments)
+            {
+                string directory = Path.GetDirectoryName(comment.FileName);
+                string fileName;
+                if (string.IsNullOrEmpty(directory))
+                {
+                    fileName = Path.Combine(commentsDirectory.FullName, comment.FileName);
+                }
+                else
+                {
+                    Directory.CreateDirectory(Path.Combine(commentsDirectory.FullName, directory));
+                    fileName = Path.Combine(commentsDirectory.FullName, comment.FileName);
+                }
+
+                var yaml = _yamlSerializer.Serialize(comment.Metadata);
+
+                File.WriteAllText(fileName, yaml, Encoding.UTF8);
                 _logger.LogInformation($"Written '{fileName}'.");
             }
         }
