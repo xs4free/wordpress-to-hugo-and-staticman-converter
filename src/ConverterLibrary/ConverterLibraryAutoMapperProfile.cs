@@ -49,7 +49,7 @@ namespace ConverterLibrary
                 .ForMember(metadata => metadata.Id, opt => opt.MapFrom(comment => comment.Id))
                 .ForMember(metadata => metadata.Body, opt => opt.MapFrom(comment => comment.Content))
                 .ForMember(metadata => metadata.Date, opt => opt.MapFrom(comment => comment.Date))
-                .ForMember(metadata => metadata.Email, opt => opt.MapFrom(comment => MD5Hash.Create(comment.AuthorEmail)))
+                .ForMember(metadata => metadata.Email, opt => opt.MapFrom(comment => MD5Hash.Create(comment.AuthorEmail.ToLowerInvariant())))
                 .ForMember(metadata => metadata.Name, opt => opt.MapFrom(comment => comment.Author))
                 .ForMember(metadata => metadata.ReplyTo, opt => opt.MapFrom(comment => comment.Parent));
         }
