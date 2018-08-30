@@ -20,10 +20,10 @@ namespace WordpressWXR12
         public string AuthorIp { get; set; }
 
         [XmlElement(ElementName = "comment_date", Namespace = Namespaces.WP)]
-        public string Date { get; set; }
+        public XmlDateTime Date { get; set; }
 
         [XmlElement(ElementName = "comment_date_gmt", Namespace = Namespaces.WP)]
-        public string DateGmt { get; set; }
+        public XmlDateTime DateGmt { get; set; }
 
         [XmlElement(ElementName = "comment_content", Namespace = Namespaces.WP)]
         public string Content { get; set; }

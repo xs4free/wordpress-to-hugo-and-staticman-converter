@@ -16,7 +16,7 @@ namespace WordpressWXR12
         public string Description { get; set; }
 
         [XmlElement(ElementName = "pubDate")]
-        public string PublicationDate { get; set; }
+        public XmlDateTime PublicationDate { get; set; }
 
         [XmlElement(ElementName = "language")]
         public string Language { get; set; }

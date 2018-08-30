@@ -13,7 +13,7 @@ namespace WordpressWXR12
         public string Link { get; set; }
         
         [XmlElement(ElementName = "pubDate")]
-        public string PublicationDate { get; set; }
+        public XmlDateTime PublicationDate { get; set; }
         
         [XmlElement(ElementName = "creator", Namespace = Namespaces.DC)]
         public string Creator { get; set; }
@@ -34,10 +34,10 @@ namespace WordpressWXR12
         public int PostId { get; set; }
 
         [XmlElement(ElementName = "post_date", Namespace = Namespaces.WP)]
-        public string PostDate { get; set; }
+        public XmlDateTime PostDate { get; set; }
 
         [XmlElement(ElementName = "post_date_gmt", Namespace = Namespaces.WP)]
-        public string PostDateGmt { get; set; }
+        public XmlDateTime PostDateGmt { get; set; }
 
         [XmlElement(ElementName = "comment_status", Namespace = Namespaces.WP)]
         public string CommentStatus { get; set; }
