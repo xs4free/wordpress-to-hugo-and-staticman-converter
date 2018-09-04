@@ -65,7 +65,10 @@ namespace WordpressWXR12
 
         [XmlElement(ElementName = "is_sticky", Namespace = Namespaces.WP)]
         public bool IsSticky { get; set; }
-        
+
+        [XmlElement(ElementName = "attachment_url", Namespace = Namespaces.WP)]
+        public string AttachmentUrl { get; set; }
+
         [XmlElement(ElementName = "category")]
         public ItemCategory[] Categories { get; set; }
 
