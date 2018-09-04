@@ -78,7 +78,7 @@ namespace ConverterLibrary
 
         private string GetDate(Item wordpressPost)
         {
-            return wordpressPost.PostDateGmt.Value.ToString("yyyy-MM-ddThh:mm:sszzz", CultureInfo.InvariantCulture);
+            return wordpressPost.PostDateGmt.Value.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
         }
 
         private string GetFileName(Item wordpressPost)
