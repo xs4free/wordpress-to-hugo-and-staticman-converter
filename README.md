@@ -9,6 +9,8 @@ Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-
 # TODO
 - [x] Add AppVeyor build tag
 - [x] Write comments to own file
+- [x] Convert post and comment HTML to Markdown
+- [ ] Parse caption-tag in post-content; convert to figcaption
 - [ ] Parse gallery-tag in post-content
 - [ ] Improve WordpressWXR12 library with enums for field values
 - [ ] Extract WordpressWXR12 library into it's own library and NuGet-package

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using AutoMapper;
+using Html2Markdown;
 using HugoModels;
 using WordpressWXR12;
 using Comment = WordpressWXR12.Comment;
@@ -36,7 +37,7 @@ namespace ConverterLibrary
             CreateMap<Item, Post>()
                 .ForMember(post => post.Filename, opt => opt.MapFrom(item => GetFileName(item)))
                 .ForMember(post => post.Metadata, opt => opt.MapFrom(item => item))
-                .ForMember(post => post.Content, opt => opt.MapFrom(item => GetContent(item)));
+                .ForMember(post => post.Content, opt => opt.ResolveUsing((item, post, x, context) => GetContent(item, context.GetAttachments())));
 
             CreateMap<Item, IEnumerable<HugoModels.Comment>>()
                 .ConvertUsing<ItemToCommentConverter>();
@@ -47,16 +48,32 @@ namespace ConverterLibrary
 
             CreateMap<Comment, CommentMetadata>()
                 .ForMember(metadata => metadata.Id, opt => opt.MapFrom(comment => comment.Id))
-                .ForMember(metadata => metadata.Body, opt => opt.MapFrom(comment => comment.Content))
+                .ForMember(metadata => metadata.Body, opt => opt.MapFrom(comment => GetBody(comment)))
                 .ForMember(metadata => metadata.Date, opt => opt.MapFrom(comment => comment.Date))
                 .ForMember(metadata => metadata.Email, opt => opt.MapFrom(comment => MD5Hash.Create(comment.AuthorEmail.Trim().ToLowerInvariant())))
                 .ForMember(metadata => metadata.Name, opt => opt.MapFrom(comment => comment.Author))
                 .ForMember(metadata => metadata.ReplyTo, opt => opt.MapFrom(comment => comment.Parent));
         }
 
-        private string GetContent(Item item)
+        private string GetContent(Item item, IDictionary<int, Item> attachments)
         {
-            return item.Content; //TODO: parse gallery-tag from content "[gallery type="rectangular" size="medium" ids="864,865,867,868,874,870,871,872,873"]"
+            var converter = new Converter();
+            var html = item.Content;
+
+            //TODO: parse caption-tag from content "[caption id="attachment_609" align="aligncenter" width="697"]<img class="wp-image-609 size-large" src="https://www.progz.nl/wp-content/uploads/2017/11/img_6111-1024x683.jpg" alt="" width="697" height="465" /> Skyline van Hong Kong[/caption]"
+            //TODO: parse gallery-tag from content "[gallery type="rectangular" size="medium" ids="864,865,867,868,874,870,871,872,873"]"
+
+            var markdown = converter.Convert(html);
+            return markdown; 
+        }
+
+        private string GetBody(Comment comment)
+        {
+            var converter = new Converter();
+            var html = comment.Content;
+            var markdown = converter.Convert(html);
+
+            return markdown;
         }
 
         private string GetDate(Item wordpressPost)
