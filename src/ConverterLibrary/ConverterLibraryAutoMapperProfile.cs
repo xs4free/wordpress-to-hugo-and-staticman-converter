@@ -15,6 +15,8 @@ namespace ConverterLibrary
         public const string ItemNameAttachments = "attachements";
         public const string ItemNameSiteUrl = "siteUrl";
 
+        private readonly CaptionTagReplacer _captionTagReplacer = new CaptionTagReplacer();
+
         public ConverterLibraryAutoMapperProfile()
         {
             CreateMap<Item, PostMetadata>()
@@ -60,7 +62,8 @@ namespace ConverterLibrary
             var converter = new Converter();
             var html = item.Content;
 
-            //TODO: parse caption-tag from content "[caption id="attachment_609" align="aligncenter" width="697"]<img class="wp-image-609 size-large" src="https://www.progz.nl/wp-content/uploads/2017/11/img_6111-1024x683.jpg" alt="" width="697" height="465" /> Skyline van Hong Kong[/caption]"
+            html = _captionTagReplacer.Replace(attachments, html);
+
             //TODO: parse gallery-tag from content "[gallery type="rectangular" size="medium" ids="864,865,867,868,874,870,871,872,873"]"
 
             var markdown = converter.Convert(html);
