@@ -15,6 +15,7 @@ namespace ConverterLibrary
         public const string ItemNameAttachments = "attachements";
         public const string ItemNameSiteUrl = "siteUrl";
 
+        private readonly GalleryTagReplacer _galleryTagReplacer = new GalleryTagReplacer();
         private readonly CaptionTagReplacer _captionTagReplacer = new CaptionTagReplacer();
 
         public ConverterLibraryAutoMapperProfile()
@@ -63,8 +64,7 @@ namespace ConverterLibrary
             var html = item.Content;
 
             html = _captionTagReplacer.Replace(attachments, html);
-
-            //TODO: parse gallery-tag from content "[gallery type="rectangular" size="medium" ids="864,865,867,868,874,870,871,872,873"]"
+            html = _galleryTagReplacer.Replace(attachments, html);
 
             var markdown = converter.Convert(html);
             return markdown; 
