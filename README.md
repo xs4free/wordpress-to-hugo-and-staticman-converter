@@ -10,6 +10,7 @@ Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-
 - [x] Add AppVeyor build tag
 - [x] Write comments to own file
 - [x] Convert post and comment HTML to Markdown
+- [x] Add banner-property to Hugo-markdown based on Wordpress postmeta-key "_thumbnail_id"
 - [ ] Parse caption-tag in post-content; convert to figcaption
 - [ ] Parse gallery-tag in post-content
 - [ ] Improve WordpressWXR12 library with enums for field values

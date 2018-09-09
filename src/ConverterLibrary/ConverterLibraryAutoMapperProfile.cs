@@ -31,7 +31,7 @@ namespace ConverterLibrary
                 .ForMember(metadata => metadata.Date, opt => opt.MapFrom(item => GetDate(item)))
                 .ForMember(metadata => metadata.Categories, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "category")))
                 .ForMember(metadata => metadata.Tags, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "post_tag")))
-                .ForMember(metadata => metadata.FeaturedImage, opt => opt.ResolveUsing((item, metadata, x, context) => GetFeaturedImage(item, context.GetAttachments(), context.GetSiteUrl())))
+                .ForMember(metadata => metadata.Banner, opt => opt.ResolveUsing((item, metadata, x, context) => GetBannerImage(item, context.GetAttachments(), context.GetSiteUrl())))
                 ;
 
             CreateMap<ItemCategory, string>()
@@ -93,7 +93,7 @@ namespace ConverterLibrary
 
         }
 
-        private string GetFeaturedImage(Item post, IDictionary<int, Item> attachments, string siteUrl)
+        private string GetBannerImage(Item post, IDictionary<int, Item> attachments, string siteUrl)
         {
             string url = null;
 
