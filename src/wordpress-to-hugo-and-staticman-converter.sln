@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConverterLibrary.Tests", "ConverterLibrary.Tests\ConverterLibrary.Tests.csproj", "{E6DFD447-9559-4265-AB68-C2F7BC6ED9FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{91584D94-4059-4F5D-9646-AC194E5F15D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91584D94-4059-4F5D-9646-AC194E5F15D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91584D94-4059-4F5D-9646-AC194E5F15D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6DFD447-9559-4265-AB68-C2F7BC6ED9FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6DFD447-9559-4265-AB68-C2F7BC6ED9FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6DFD447-9559-4265-AB68-C2F7BC6ED9FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6DFD447-9559-4265-AB68-C2F7BC6ED9FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

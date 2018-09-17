@@ -1,4 +1,5 @@
 ﻿using System;
+using ConverterLibrary.Replacers.ImageReplacer;
 using Microsoft.Extensions.DependencyInjection;
 using WordpressWXR12;
 using YamlDotNet.Serialization;
@@ -16,6 +17,7 @@ namespace ConverterLibrary
             }
 
             services.AddSingleton<Serializer>(GetYamlSerializer());
+            services.AddSingleton(new ImageReplacer());
             services.AddSingleton<IWordpressWXRParser>(new WordpressWXRParser());
 
             return services;

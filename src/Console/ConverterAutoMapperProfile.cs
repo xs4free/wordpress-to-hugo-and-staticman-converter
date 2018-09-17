@@ -11,7 +11,8 @@ namespace wordpress_to_hugo_and_staticman_converter
             CreateMap<Options, ConverterOptions>()
                 .ForMember(dest => dest.InputFile, opt => opt.MapFrom(src => Path.GetFullPath(src.InputFile)))
                 .ForMember(dest => dest.OutputDirectory,
-                    opt => opt.MapFrom(src => Path.GetFullPath(src.OutputDirectory)));
+                    opt => opt.MapFrom(src => Path.GetFullPath(src.OutputDirectory)))
+                .ForMember(dest => dest.UploadDirectories, opt => opt.MapFrom(src => src.UploadDirectories));
         }
     }
 }

@@ -11,7 +11,7 @@ namespace WordpressWXR12
     {
         public DateTime Value { get; set; }
         public bool HasValue => Value != DateTime.MinValue;
-        private const string XmlDateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
+        public const string XmlDateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
 
         public System.Xml.Schema.XmlSchema GetSchema()
         {

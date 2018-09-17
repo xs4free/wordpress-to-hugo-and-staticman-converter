@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.Collections.Generic;
+using CommandLine;
 
 namespace wordpress_to_hugo_and_staticman_converter
 {
@@ -9,5 +10,8 @@ namespace wordpress_to_hugo_and_staticman_converter
 
         [Option('o', "output", Required = true, HelpText = "Location where hugo-files will be written.")]
         public string OutputDirectory { get; set; }
+
+        [Option('c', "content", Required = false, HelpText = "Location(s) of wp-contents folder(s) where images from Wordpress can be found.", Separator = ',')]
+        public IEnumerable<string> UploadDirectories { get; set; }
     }
 }

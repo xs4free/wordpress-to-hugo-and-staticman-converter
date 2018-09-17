@@ -14,6 +14,7 @@ namespace ConverterLibrary
     {
         public const string ItemNameAttachments = "attachements";
         public const string ItemNameSiteUrl = "siteUrl";
+        public const string HugoDateTimeFormat = "yyyy-MM-ddTHH:mm:sszzz";
 
         private readonly GalleryTagReplacer _galleryTagReplacer = new GalleryTagReplacer();
         private readonly CaptionTagReplacer _captionTagReplacer = new CaptionTagReplacer();
@@ -81,7 +82,7 @@ namespace ConverterLibrary
 
         private string GetDate(Item wordpressPost)
         {
-            return wordpressPost.PostDateGmt.Value.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
+            return wordpressPost.PostDateGmt.Value.ToString(HugoDateTimeFormat, CultureInfo.InvariantCulture);
         }
 
         private string GetFileName(Item wordpressPost)

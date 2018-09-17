@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using HugoModels;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using AutoMapper;
+using ConverterLibrary.Extensions;
+using ConverterLibrary.Replacers.ImageReplacer;
 using WordpressWXR12;
 using YamlDotNet.Serialization;
 
@@ -16,17 +20,20 @@ namespace ConverterLibrary
         private readonly IMapper _mapper;
         private readonly Serializer _yamlSerializer;
         private readonly IWordpressWXRParser _parser;
+        private readonly ImageReplacer _imageReplacer;
 
         public WordpressToHugoConverter(
             ILogger<WordpressToHugoConverter> logger, 
             IMapper mapper, 
             Serializer yamlSerializer, 
-            IWordpressWXRParser parser)
+            IWordpressWXRParser parser,
+            ImageReplacer imageReplacer)
         {
             _logger = logger;
             _mapper = mapper;
             _yamlSerializer = yamlSerializer;
             _parser = parser;
+            _imageReplacer = imageReplacer;
         }
 
         public void Convert(ConverterOptions options)
@@ -75,17 +82,89 @@ namespace ConverterLibrary
                     fileName = Path.Combine(options.OutputDirectory, hugoPost.Filename);
                 }
 
+                string imageBaseUrl = GetImageBaseUrl(hugoPost, "/static/uploads");
+                string postContent = _imageReplacer.Replace(hugoPost.Content, content.Channel.Link, imageBaseUrl, out ImageReplacerResult[] replacedImages);
+
+                if (!string.IsNullOrEmpty(hugoPost.Metadata.Banner))
+                {
+                    var bannerSegments = hugoPost.Metadata.Banner.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                    hugoPost.Metadata.Banner = imageBaseUrl.CombineUri(bannerSegments.Last());
+
+                    //TODO: add banner to replacedImages!
+                }
+
+                CopyReplacedImagesToOutputDirectory(options, replacedImages);
+
                 var yaml = _yamlSerializer.Serialize(hugoPost.Metadata);
 
                 StringBuilder hugoYaml = new StringBuilder();
                 hugoYaml.AppendLine("---");
                 hugoYaml.AppendLine(yaml);
                 hugoYaml.AppendLine("---");
-                hugoYaml.AppendLine(hugoPost.Content);
+                hugoYaml.AppendLine(postContent);
 
                 File.WriteAllText(fileName, hugoYaml.ToString(), Encoding.UTF8);
                 _logger.LogInformation($"Written '{fileName}'.");
             }
+        }
+
+        private void CopyReplacedImagesToOutputDirectory(ConverterOptions options, ImageReplacerResult[] replacedImages)
+        {
+            if (options.UploadDirectories != null && options.UploadDirectories.Any())
+            {
+                foreach (var replacedImage in replacedImages)
+                {
+                    bool imageFound = false;
+                    List<string> checkedPaths = new List<string>();
+
+                    foreach (var uploadDirectory in options.UploadDirectories)
+                    {
+                        string originalImage = Path.Combine(uploadDirectory, replacedImage.OriginalRelativeUrl.UrlToPath().RemoveFirstBackslash());
+                        string newImageLocation = Path.Combine(options.OutputDirectory, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
+
+                        if (File.Exists(originalImage))
+                        {
+                            string directoryName = Path.GetDirectoryName(newImageLocation);
+                            if (!Directory.Exists(directoryName))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(newImageLocation));
+                            }
+
+                            File.Copy(originalImage, newImageLocation, true);
+
+                            _logger.LogInformation($"Copied '{originalImage}' to '{newImageLocation}'.");
+                            imageFound = true;
+                            break;
+                        }
+                        else
+                        {
+                            checkedPaths.Add(originalImage);
+                        }
+                    }
+
+                    if (!imageFound)
+                    {
+                        _logger.LogWarning($"Could not find content '{string.Join(',', checkedPaths)}'.");
+                    }
+                }
+            }
+        }
+
+        private string GetImageBaseUrl(Post hugoPost, string staticUploads)
+        {
+            string imageBaseUrl = staticUploads;
+
+            if (DateTime.TryParseExact(
+                hugoPost.Metadata.Date,
+                ConverterLibraryAutoMapperProfile.HugoDateTimeFormat, 
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal,
+                out DateTime date))
+            {
+                imageBaseUrl = $"{staticUploads}/{date.Year:0000}/{date.Month:00}/";
+            }
+
+            return imageBaseUrl;
         }
 
         private void WriteComments(RSS content, ConverterOptions options)
