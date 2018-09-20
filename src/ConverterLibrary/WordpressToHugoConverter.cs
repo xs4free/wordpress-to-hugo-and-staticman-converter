@@ -16,6 +16,9 @@ namespace ConverterLibrary
 {
     public class WordpressToHugoConverter
     {
+        private const string HugoContentDirectoryName = "content";
+        private const string HugoStaticDirectoryName = "static";
+
         private readonly ILogger<WordpressToHugoConverter> _logger;
         private readonly IMapper _mapper;
         private readonly Serializer _yamlSerializer;
@@ -67,14 +70,14 @@ namespace ConverterLibrary
                     opts.Items[ConverterLibraryAutoMapperProfile.ItemNameSiteUrl] = content.Channel.Link;
                 }));
 
-            Directory.CreateDirectory(Path.Combine(options.OutputDirectory, "posts"));
+            Directory.CreateDirectory(Path.Combine(options.OutputDirectory, HugoContentDirectoryName));
             foreach (var hugoPost in hugoPosts)
             {
                 string directory = Path.GetDirectoryName(hugoPost.Filename);
                 string fileName;
                 if (string.IsNullOrEmpty(directory))
                 {
-                    fileName = Path.Combine(options.OutputDirectory, "posts", hugoPost.Filename);
+                    fileName = Path.Combine(options.OutputDirectory, HugoContentDirectoryName, hugoPost.Filename);
                 }
                 else
                 {
@@ -82,16 +85,8 @@ namespace ConverterLibrary
                     fileName = Path.Combine(options.OutputDirectory, hugoPost.Filename);
                 }
 
-                string imageBaseUrl = GetImageBaseUrl(hugoPost, "/static/uploads");
-                string postContent = _imageReplacer.Replace(hugoPost.Content, content.Channel.Link, imageBaseUrl, out ImageReplacerResult[] replacedImages);
-
-                if (!string.IsNullOrEmpty(hugoPost.Metadata.Banner))
-                {
-                    var bannerSegments = hugoPost.Metadata.Banner.Split('/', StringSplitOptions.RemoveEmptyEntries);
-                    hugoPost.Metadata.Banner = imageBaseUrl.CombineUri(bannerSegments.Last());
-
-                    //TODO: add banner to replacedImages!
-                }
+                string imageBaseUrl = GetImageBaseUrl(hugoPost, "/uploads");
+                var replacedImages = _imageReplacer.Replace(hugoPost, content.Channel.Link, imageBaseUrl);
 
                 CopyReplacedImagesToOutputDirectory(options, replacedImages);
 
@@ -101,14 +96,14 @@ namespace ConverterLibrary
                 hugoYaml.AppendLine("---");
                 hugoYaml.AppendLine(yaml);
                 hugoYaml.AppendLine("---");
-                hugoYaml.AppendLine(postContent);
+                hugoYaml.AppendLine(hugoPost.Content);
 
                 File.WriteAllText(fileName, hugoYaml.ToString(), Encoding.UTF8);
                 _logger.LogInformation($"Written '{fileName}'.");
             }
         }
 
-        private void CopyReplacedImagesToOutputDirectory(ConverterOptions options, ImageReplacerResult[] replacedImages)
+        private void CopyReplacedImagesToOutputDirectory(ConverterOptions options, IEnumerable<ImageReplacerResult> replacedImages)
         {
             if (options.UploadDirectories != null && options.UploadDirectories.Any())
             {
@@ -120,7 +115,7 @@ namespace ConverterLibrary
                     foreach (var uploadDirectory in options.UploadDirectories)
                     {
                         string originalImage = Path.Combine(uploadDirectory, replacedImage.OriginalRelativeUrl.UrlToPath().RemoveFirstBackslash());
-                        string newImageLocation = Path.Combine(options.OutputDirectory, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
+                        string newImageLocation = Path.Combine(options.OutputDirectory, HugoStaticDirectoryName, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
 
                         if (File.Exists(originalImage))
                         {
