@@ -1,3 +1,4 @@
+using HugoModels;
 using Xunit;
 using CL = ConverterLibrary.Replacers.ImageReplacer;
 
@@ -11,68 +12,87 @@ namespace ConverterLibrary.Tests.Replacers.ImageReplacer
         [Fact]
         public void Replace_should_handle_simple_markdown_image()
         {
-            string yaml = "[![](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)]";
-
+            var post = new Post { Content = "[![](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)]" };
             var sut = new CL.ImageReplacer();
-            string resultYaml = sut.Replace(yaml, SiteUrlHttp, ImageBaseUrl, out CL.ImageReplacerResult[] results);
+
+            sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
 
             string expectedYaml = $"[![]({ImageBaseUrl}/image.jpg)]";
-
-            Assert.Equal(expectedYaml, resultYaml);
+            Assert.Equal(expectedYaml, post.Content);
         }
 
         [Fact]
         public void Replace_should_handle_markdown_image_with_title()
         {
-            string yaml = "[![](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg \"test\")]";
-
+            var post = new Post { Content = "[![](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg \"test\")]" };
             var sut = new CL.ImageReplacer();
-            string resultYaml = sut.Replace(yaml, SiteUrlHttp, ImageBaseUrl, out CL.ImageReplacerResult[] results);
+
+            sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
 
             string expectedYaml = $"[![]({ImageBaseUrl}/image.jpg \"test\")]";
-
-            Assert.Equal(expectedYaml, resultYaml);
+            Assert.Equal(expectedYaml, post.Content);
         }
 
         [Fact]
         public void Replace_should_handle_markdown_image_with_alt_text()
         {
-            string yaml = "[![test](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)]";
-
+            var post = new Post { Content = "[![test](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)]" };
             var sut = new CL.ImageReplacer();
-            string resultYaml = sut.Replace(yaml, SiteUrlHttp, ImageBaseUrl, out CL.ImageReplacerResult[] results);
+
+            sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
 
             string expectedYaml = $"[![test]({ImageBaseUrl}/image.jpg)]";
-
-            Assert.Equal(expectedYaml, resultYaml);
+            Assert.Equal(expectedYaml, post.Content);
         }
 
         [Fact]
         public void Replace_should_handle_http_urls_to_images()
         {
-            string yaml =
-                "[![](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg \"test\")](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)";
-
+            var post = new Post
+            {
+                Content =
+                    "[![](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg \"test\")](http://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)"
+            };
             var sut = new CL.ImageReplacer();
-            string resultYaml = sut.Replace(yaml, SiteUrlHttp, ImageBaseUrl, out CL.ImageReplacerResult[] results);
+
+            sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
 
             string expectedYaml = $"[![]({ImageBaseUrl}/image.jpg \"test\")]({ImageBaseUrl}/image.jpg)";
-
-            Assert.Equal(expectedYaml, resultYaml);
+            Assert.Equal(expectedYaml, post.Content);
         }
 
         [Fact]
         public void Replace_should_handle_https_urls_to_images()
         {
-            string yaml =
-                "[![](https://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg \"test\")](https://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)";
-
+            var post = new Post
+            {
+                Content =
+                    "[![](https://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg \"test\")](https://www.site.com/weblog/wp-content/uploads/2010/08/image.jpg)"
+            };
             var sut = new CL.ImageReplacer();
-            string resultYaml = sut.Replace(yaml, SiteUrlHttp, ImageBaseUrl, out CL.ImageReplacerResult[] results);
+
+            sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
 
             string expectedYaml = $"[![]({ImageBaseUrl}/image.jpg \"test\")]({ImageBaseUrl}/image.jpg)";
+            Assert.Equal(expectedYaml, post.Content);
+        }
 
-            Assert.Equal(expectedYaml, resultYaml);
+        [Fact]
+        public void Replace_should_change_banner()
+        {
+            var post = new Post
+            {
+                Metadata = new PostMetadata
+                {
+                    Banner = "/img/test1/image.jpg"
+                }
+            };
+            var sut = new CL.ImageReplacer();
+
+            sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
+
+            string expectedBanner = $"{ImageBaseUrl}/image.jpg";
+            Assert.Equal(expectedBanner, post.Metadata.Banner);
         }
     }
 }

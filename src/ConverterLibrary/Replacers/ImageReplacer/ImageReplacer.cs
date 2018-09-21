@@ -30,7 +30,7 @@ namespace ConverterLibrary.Replacers.ImageReplacer
 
         private static void ReplaceBannerLink(Post hugoPost, string imageBaseUrl, List<ImageReplacerResult> replacedImageResults)
         {
-            if (!string.IsNullOrEmpty(hugoPost.Metadata.Banner))
+            if (!string.IsNullOrEmpty(hugoPost?.Metadata?.Banner))
             {
                 var originalRelativeUrl = hugoPost.Metadata.Banner;
                 var bannerSegments = hugoPost.Metadata.Banner.Split('/', StringSplitOptions.RemoveEmptyEntries);
@@ -64,7 +64,7 @@ namespace ConverterLibrary.Replacers.ImageReplacer
         private void ReplaceImageLinksInContent(string siteUrl, string imageBaseUrl, Post hugoPost,
             List<ImageReplacerResult> replacedImageResults)
         {
-            string replacedContent = _regexMarkdownImages.Replace(hugoPost.Content, m =>
+            string replacedContent = _regexMarkdownImages.Replace(hugoPost.Content ?? String.Empty, m =>
             {
                 string title = m.Groups["title"].Value;
                 string alt = m.Groups["alt"].Value;
