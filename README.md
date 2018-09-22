@@ -11,6 +11,8 @@ Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-
 - [x] Write comments to own file
 - [x] Convert post and comment HTML to Markdown
 - [x] Add banner-property to Hugo-markdown based on Wordpress postmeta-key "_thumbnail_id"
+- [ ] Save blogs in [Page Resources/Bundles][9] instead of all .md files in one directory
+- [ ] Build using [Microsoft Azure DevOps][10] instead of AppVeyor
 - [ ] Parse caption-tag in post-content; convert to figcaption
 - [ ] Parse gallery-tag in post-content
 - [ ] Improve WordpressWXR12 library with enums for field values
@@ -25,3 +27,5 @@ Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-
 [6]: https://twitter.com/SchumacherFM
 [7]: https://networkhobo.com/2017/12/30/hugo---staticman-nested-replies-and-e-mail-notifications/
 [8]: http://twitter.com/dancwilliams
+[9]: https://regisphilibert.com/blog/2018/01/hugo-page-resources-and-how-to-use-them/
+[10]: https://azure.microsoft.com/services/devops/
