@@ -16,6 +16,7 @@ namespace ConverterLibrary
     {
         public const string ItemNameAttachments = "attachements";
         public const string ItemNameSiteUrl = "siteUrl";
+        public const string ItemNamePageResources = "pageResources";
         public const string HugoDateTimeFormat = "yyyy-MM-ddTHH:mm:sszzz";
 
         private readonly GalleryTagReplacer _galleryTagReplacer = new GalleryTagReplacer();
@@ -35,7 +36,6 @@ namespace ConverterLibrary
                 .ForMember(metadata => metadata.Categories, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "category")))
                 .ForMember(metadata => metadata.Tags, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "post_tag")))
                 .ForMember(metadata => metadata.Resources, opt => opt.MapFrom(item => item));
-                ;
 
             CreateMap<Item, IEnumerable<Resource>>()
                 .ConvertUsing<ItemToResourcesConverter>();
@@ -44,7 +44,7 @@ namespace ConverterLibrary
                 .ProjectUsing(item => item.Text);
 
             CreateMap<Item, Post>()
-                .ForMember(post => post.Filename, opt => opt.MapFrom(item => GetFileName(item)))
+                .ForMember(post => post.Filename, opt => opt.ResolveUsing((item, post, x, context) => GetFileName(item, context.UsePagedResources())))
                 .ForMember(post => post.Metadata, opt => opt.MapFrom(item => item))
                 .ForMember(post => post.Content, opt => opt.ResolveUsing((item, post, x, context) => GetContent(item, context.GetAttachments())));
 
@@ -90,12 +90,17 @@ namespace ConverterLibrary
             return wordpressPost.PostDateGmt.Value.ToString(HugoDateTimeFormat, CultureInfo.InvariantCulture);
         }
 
-        private string GetFileName(Item wordpressPost)
+        private string GetFileName(Item wordpressPost, bool usePageResources)
         {
-            string decodedPostName = string.IsNullOrEmpty(wordpressPost.PostName) ? WebUtility.UrlDecode(wordpressPost.Title.Replace(" ", "-").ToLowerInvariant()) : WebUtility.UrlDecode(wordpressPost.PostName);
-            return wordpressPost.PostType == "page"
-                ? $"{decodedPostName}/index.md"
-                : $"{wordpressPost.PostDateGmt.Value:yyyy-MM-dd}-{decodedPostName}.md";
+            string decodedPostName = string.IsNullOrEmpty(wordpressPost.PostName)
+                ? WebUtility.UrlDecode(wordpressPost.Title.Replace(" ", "-").ToLowerInvariant())
+                : WebUtility.UrlDecode(wordpressPost.PostName);
+
+            string fileName = wordpressPost.PostType == "page"
+                ? $"{decodedPostName}\\index.md"
+                : $"{wordpressPost.PostDateGmt.Value:yyyy-MM-dd}-{decodedPostName}{ (usePageResources ? "\\index" : "")}.md";
+
+            return fileName;
         }
 
         private string GetPermaLink(Item post, string siteUrl)

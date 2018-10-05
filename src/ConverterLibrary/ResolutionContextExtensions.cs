@@ -15,5 +15,10 @@ namespace ConverterLibrary
         {
             return context.Items[ConverterLibraryAutoMapperProfile.ItemNameAttachments] as IDictionary<int, Item>;
         }
+
+        public static bool UsePagedResources(this ResolutionContext context)
+        {
+            return (bool)context.Items[ConverterLibraryAutoMapperProfile.ItemNamePageResources];
+        }
     }
 }

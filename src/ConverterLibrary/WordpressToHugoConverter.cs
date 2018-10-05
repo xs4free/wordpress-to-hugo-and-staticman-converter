@@ -16,8 +16,8 @@ namespace ConverterLibrary
 {
     public class WordpressToHugoConverter
     {
-        private const string HugoContentDirectoryName = "content";
         private const string HugoStaticDirectoryName = "static";
+        private const string HugoContentDirectoryName = "content";
 
         private readonly ILogger<WordpressToHugoConverter> _logger;
         private readonly IMapper _mapper;
@@ -43,6 +43,10 @@ namespace ConverterLibrary
         {
             Directory.CreateDirectory(options.OutputDirectory);
             _logger.LogInformation($"Output will be written to: '{options.OutputDirectory}'.");
+            if (options.PageResources)
+            {
+                _logger.LogInformation("Hugo page resources will be created.");
+            }
 
             if (ValidateOptions(options))
             {
@@ -68,24 +72,20 @@ namespace ConverterLibrary
                 {
                     opts.Items[ConverterLibraryAutoMapperProfile.ItemNameAttachments] = attachments;
                     opts.Items[ConverterLibraryAutoMapperProfile.ItemNameSiteUrl] = content.Channel.Link;
+                    opts.Items[ConverterLibraryAutoMapperProfile.ItemNamePageResources] = options.PageResources;
                 }));
 
-            Directory.CreateDirectory(Path.Combine(options.OutputDirectory, HugoContentDirectoryName));
             foreach (var hugoPost in hugoPosts)
             {
-                string directory = Path.GetDirectoryName(hugoPost.Filename);
-                string fileName;
-                if (string.IsNullOrEmpty(directory))
-                {
-                    fileName = Path.Combine(options.OutputDirectory, HugoContentDirectoryName, hugoPost.Filename);
-                }
-                else
-                {
-                    Directory.CreateDirectory(Path.Combine(options.OutputDirectory, directory));
-                    fileName = Path.Combine(options.OutputDirectory, hugoPost.Filename);
-                }
+                string postRelativeDirectory = Path.GetDirectoryName(hugoPost.Filename);
+                string outputDirectory = hugoPost.Metadata.Type == "page"
+                    ? options.OutputDirectory
+                    : Path.Combine(options.OutputDirectory, HugoContentDirectoryName);
+                string postFileName = Path.Combine(outputDirectory, hugoPost.Filename);
+                string postFullDirectory = Path.GetDirectoryName(postFileName);
+                Directory.CreateDirectory(postFullDirectory);
 
-                string imageBaseUrl = GetImageBaseUrl(hugoPost, "/uploads");
+                string imageBaseUrl = options.PageResources ? $"/{postRelativeDirectory.PathToUrl()}" : GetImageBaseUrl(hugoPost, "/uploads");
                 var replacedImages = _imageReplacer.Replace(hugoPost, content.Channel.Link, imageBaseUrl);
 
                 CopyReplacedImagesToOutputDirectory(options, replacedImages);
@@ -98,8 +98,8 @@ namespace ConverterLibrary
                 hugoYaml.AppendLine("---");
                 hugoYaml.AppendLine(hugoPost.Content);
 
-                File.WriteAllText(fileName, hugoYaml.ToString(), Encoding.UTF8);
-                _logger.LogInformation($"Written '{fileName}'.");
+                File.WriteAllText(postFileName, hugoYaml.ToString(), Encoding.UTF8);
+                _logger.LogInformation($"Written '{postFileName}'.");
             }
         }
 
@@ -115,7 +115,8 @@ namespace ConverterLibrary
                     foreach (var uploadDirectory in options.UploadDirectories)
                     {
                         string originalImage = Path.Combine(uploadDirectory, replacedImage.OriginalRelativeUrl.UrlToPath().RemoveFirstBackslash());
-                        string newImageLocation = Path.Combine(options.OutputDirectory, HugoStaticDirectoryName, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
+                        string outputDirectory = Path.Combine(options.OutputDirectory, options.PageResources ? HugoContentDirectoryName : HugoStaticDirectoryName);
+                        string newImageLocation = Path.Combine(outputDirectory, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
 
                         if (File.Exists(originalImage))
                         {

@@ -13,6 +13,14 @@ namespace ConverterLibrary.Extensions
             return path;
         }
 
+        public static string PathToUrl(this string path)
+        {
+            string encodedPath = HttpUtility.UrlEncode(path);
+            string url = encodedPath?.Replace('\\', '/');
+
+            return url;
+        }
+
         public static string RemoveFirstBackslash(this string path)
         {
             string result = path;
