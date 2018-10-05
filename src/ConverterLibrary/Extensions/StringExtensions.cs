@@ -40,5 +40,10 @@ namespace ConverterLibrary.Extensions
             }
             return uri;
         }
+
+        public static string RemoveBaseUrl(this string url, string baseUrl)
+        {
+            return url?.Replace(baseUrl, string.Empty);
+        }
     }
 }

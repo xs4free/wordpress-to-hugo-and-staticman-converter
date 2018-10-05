@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using AutoMapper;
+using ConverterLibrary.Extensions;
 using Html2Markdown;
 using HugoModels;
 using WordpressWXR12;
@@ -32,7 +33,7 @@ namespace ConverterLibrary
                 .ForMember(metadata => metadata.Date, opt => opt.MapFrom(item => GetDate(item)))
                 .ForMember(metadata => metadata.Categories, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "category")))
                 .ForMember(metadata => metadata.Tags, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "post_tag")))
-                .ForMember(metadata => metadata.Banner, opt => opt.ResolveUsing((item, metadata, x, context) => GetBannerImage(item, context.GetAttachments(), context.GetSiteUrl())))
+                .ForMember(metadata => metadata.Banner, opt => opt.ResolveUsing((item, metadata, x, context) => item.GetBannerImage(context.GetAttachments())?.Guid.Text.RemoveBaseUrl(context.GetSiteUrl())))
                 ;
 
             CreateMap<ItemCategory, string>()
@@ -91,26 +92,6 @@ namespace ConverterLibrary
             return wordpressPost.PostType == "page"
                 ? $"{decodedPostName}/index.md"
                 : $"{wordpressPost.PostDateGmt.Value:yyyy-MM-dd}-{decodedPostName}.md";
-
-        }
-
-        private string GetBannerImage(Item post, IDictionary<int, Item> attachments, string siteUrl)
-        {
-            string url = null;
-
-            PostMeta thumbnail = post.PostMetas?.FirstOrDefault(meta => meta.Key == "_thumbnail_id");
-            if (thumbnail != null)
-            {
-                if (int.TryParse(thumbnail.Value, out int thumbnailId))
-                {
-                    if (attachments.TryGetValue(thumbnailId, out Item attachment))
-                    {
-                        url = attachment.Guid.Text;
-                    }
-                }
-            }
-
-            return RemoveSiteUrl(url, siteUrl);
         }
 
         private string GetPermaLink(Item post, string siteUrl)
@@ -122,12 +103,7 @@ namespace ConverterLibrary
                 url = string.IsNullOrEmpty(post.Link) ? post.Guid?.Text : post.Link;
             }
 
-            return RemoveSiteUrl(url, siteUrl);
-        }
-
-        private string RemoveSiteUrl(string url, string siteUrl)
-        {
-            return url?.Replace(siteUrl, string.Empty);
+            return url.RemoveBaseUrl(siteUrl);
         }
     }
 }
