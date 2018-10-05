@@ -1,3 +1,4 @@
+using System.Linq;
 using HugoModels;
 using Xunit;
 using CL = ConverterLibrary.Replacers.ImageReplacer;
@@ -78,21 +79,28 @@ namespace ConverterLibrary.Tests.Replacers.ImageReplacer
         }
 
         [Fact]
-        public void Replace_should_change_banner()
+        public void Replace_should_change_resources()
         {
             var post = new Post
             {
                 Metadata = new PostMetadata
                 {
-                    Banner = "/img/test1/image.jpg"
+                    Resources = new []
+                    {
+                        new Resource
+                        {
+                            Src = "/img/test1/image.jpg"
+                        }
+                    }
+                        
                 }
             };
             var sut = new CL.ImageReplacer();
 
             sut.Replace(post, SiteUrlHttp, ImageBaseUrl);
 
-            string expectedBanner = $"{ImageBaseUrl}/image.jpg";
-            Assert.Equal(expectedBanner, post.Metadata.Banner);
+            string expectedResourceSrc = $"{ImageBaseUrl}/image.jpg";
+            Assert.Equal(expectedResourceSrc, post.Metadata.Resources.First().Src);
         }
     }
 }
