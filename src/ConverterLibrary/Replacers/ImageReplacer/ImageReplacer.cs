@@ -23,26 +23,30 @@ namespace ConverterLibrary.Replacers.ImageReplacer
 
             ReplaceImageLinksInContent(siteUrl, imageBaseUrl, hugoPost, replacedImageResults);
             ReplaceLinksToImagesInContent(siteUrl, replacedImageResults, hugoPost);
-            ReplaceBannerLink(hugoPost, imageBaseUrl, replacedImageResults);
+            ReplaceImageLinksInResources(imageBaseUrl, hugoPost, replacedImageResults);
 
             return replacedImageResults;
         }
 
-        private static void ReplaceBannerLink(Post hugoPost, string imageBaseUrl, List<ImageReplacerResult> replacedImageResults)
+        private void ReplaceImageLinksInResources(string imageBaseUrl, Post hugoPost, List<ImageReplacerResult> replacedImageResults)
         {
-            if (!string.IsNullOrEmpty(hugoPost?.Metadata?.Banner))
+            foreach (var resource in hugoPost.Metadata.Resources)
             {
-                var originalRelativeUrl = hugoPost.Metadata.Banner;
-                var bannerSegments = hugoPost.Metadata.Banner.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                var originalRelativeUrl = resource.Src;
+                var originalRelativeUrlSegments = originalRelativeUrl.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                var originalImageName = originalRelativeUrlSegments.Last();
+                var newRelativeUrl = imageBaseUrl.CombineUri(originalImageName);
 
-                var newRelativeUrl = imageBaseUrl.CombineUri(bannerSegments.Last());
-                hugoPost.Metadata.Banner = newRelativeUrl;
-
-                replacedImageResults.Add(new ImageReplacerResult
+                if (string.Compare(originalRelativeUrl, newRelativeUrl, StringComparison.InvariantCulture) != 0)
                 {
-                    OriginalRelativeUrl = originalRelativeUrl,
-                    NewRelativeUrl = newRelativeUrl
-                });
+                    resource.Src = newRelativeUrl;
+
+                    replacedImageResults.Add(new ImageReplacerResult
+                    {
+                        OriginalRelativeUrl = originalRelativeUrl,
+                        NewRelativeUrl = newRelativeUrl
+                    });
+                }
             }
         }
 
@@ -64,7 +68,9 @@ namespace ConverterLibrary.Replacers.ImageReplacer
         private void ReplaceImageLinksInContent(string siteUrl, string imageBaseUrl, Post hugoPost,
             List<ImageReplacerResult> replacedImageResults)
         {
-            string replacedContent = _regexMarkdownImages.Replace(hugoPost.Content ?? String.Empty, m =>
+            var resources = new List<Resource>();
+
+            string replacedContent = _regexMarkdownImages.Replace(hugoPost.Content ?? string.Empty, m =>
             {
                 string title = m.Groups["title"].Value;
                 string alt = m.Groups["alt"].Value;
@@ -72,6 +78,8 @@ namespace ConverterLibrary.Replacers.ImageReplacer
 
                 string newImgTag = GetNewImgTag(title, alt, url, siteUrl, imageBaseUrl, out string originalRelativeUrl,
                     out string newRelativeUrl);
+
+                resources.Add(CreateResource(newRelativeUrl, title, alt));
 
                 replacedImageResults.Add(new ImageReplacerResult
                 {
@@ -83,6 +91,16 @@ namespace ConverterLibrary.Replacers.ImageReplacer
             });
 
             hugoPost.Content = replacedContent;
+            hugoPost.Metadata.Resources = hugoPost.Metadata.Resources.Concat(resources);
+        }
+
+        private static Resource CreateResource(string newRelativeUrl, string title, string alt)
+        {
+            return new Resource
+            {
+                Src = newRelativeUrl,
+                Title = string.IsNullOrEmpty(title) ? string.IsNullOrEmpty(alt) ? null : alt : title
+            };
         }
 
         private string GetNewImgTag(string title, string alt, string imageUrl, string siteUrl, string imageBaseUrl, out string originalRelativeUrl, out string newRelativeUrl)

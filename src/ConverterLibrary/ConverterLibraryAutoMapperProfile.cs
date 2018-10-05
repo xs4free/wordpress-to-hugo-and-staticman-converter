@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using AutoMapper;
+using ConverterLibrary.Converters;
 using ConverterLibrary.Extensions;
 using Html2Markdown;
 using HugoModels;
@@ -33,8 +34,11 @@ namespace ConverterLibrary
                 .ForMember(metadata => metadata.Date, opt => opt.MapFrom(item => GetDate(item)))
                 .ForMember(metadata => metadata.Categories, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "category")))
                 .ForMember(metadata => metadata.Tags, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "post_tag")))
-                .ForMember(metadata => metadata.Banner, opt => opt.ResolveUsing((item, metadata, x, context) => item.GetBannerImage(context.GetAttachments())?.Guid.Text.RemoveBaseUrl(context.GetSiteUrl())))
+                .ForMember(metadata => metadata.Resources, opt => opt.MapFrom(item => item));
                 ;
+
+            CreateMap<Item, IEnumerable<Resource>>()
+                .ConvertUsing<ItemToResourcesConverter>();
 
             CreateMap<ItemCategory, string>()
                 .ProjectUsing(item => item.Text);

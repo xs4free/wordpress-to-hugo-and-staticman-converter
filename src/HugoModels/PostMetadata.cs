@@ -9,7 +9,6 @@ namespace HugoModels
         public string Type { get; set; }
         public string Date { get; set; }
         public string Url { get; set; }
-        public string Banner { get; set; }
         public string Excerpt { get; set; }
         public bool Draft { get; set; }
         public bool Private { get; set; }
