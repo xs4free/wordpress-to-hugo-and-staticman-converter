@@ -1,4 +1,6 @@
-﻿namespace HugoModels
+﻿using System.Collections.Generic;
+
+namespace HugoModels
 {
     public class PostMetadata
     {
@@ -13,5 +15,6 @@
         public bool Private { get; set; }
         public string[] Categories { get; set; }
         public string[] Tags { get; set; }
+        public IEnumerable<Resource> Resources { get; set; }
     }
 }
