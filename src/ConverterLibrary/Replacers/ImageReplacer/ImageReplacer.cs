@@ -91,10 +91,23 @@ namespace ConverterLibrary.Replacers.ImageReplacer
             });
 
             hugoPost.Content = replacedContent;
-            hugoPost.Metadata.Resources = hugoPost.Metadata.Resources.Concat(resources);
+            AddResourcesToPost(hugoPost, resources);
         }
 
-        private static Resource CreateResource(string newRelativeUrl, string title, string alt)
+        private void AddResourcesToPost(Post hugoPost, IEnumerable<Resource> resources)
+        {
+            if (hugoPost.Metadata == null)
+            {
+                hugoPost.Metadata = new PostMetadata();
+            }
+
+            var originalResources = hugoPost.Metadata.Resources ?? new List<Resource>();
+            var newCombinedResources = originalResources.Concat(resources);
+
+            hugoPost.Metadata.Resources = newCombinedResources;
+        }
+
+        private Resource CreateResource(string newRelativeUrl, string title, string alt)
         {
             return new Resource
             {
