@@ -7,20 +7,20 @@ Based my code on [wordpress-to-hugo-exporter][5] from [Cyrill Schumacher][6] whi
 Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-mail Notifications][7] by [Dan C Williams][8]. 
 
 # TODO
-- [x] Add AppVeyor build tag
-- [x] Write comments to own file
-- [x] Convert post and comment HTML to Markdown
-- [x] Add banner-property to Hugo-markdown based on Wordpress postmeta-key "_thumbnail_id"
-- [x] Save blogs in [Page Resources/Bundles][9] instead of all .md files in one directory
 - [ ] Add option to generate images using [Hugo custom shortcode (for example 'imgproc')][12] instead of regular markdown for an image
 - [ ] Build using [Microsoft Azure DevOps][10] instead of AppVeyor
 - [ ] Parse caption-tag in post-content; convert to figcaption
-- [ ] Parse gallery-tag in post-content into page-resources (specified in the header) 
 - [ ] Improve WordpressWXR12 library with enums for field values
 - [ ] Extract WordpressWXR12 library into it's own library and NuGet-package
 - [ ] Validate images referenced in posts are presents in static content folder
 - [ ] Validate links in posts referencing images in site are present in static content folder (example 'DSC01373.jpg' in '2010/09/27/terugvlucht-naar-nederland')
 - [ ] Remove context dependency from AutoMapper Profile class (ConverterLibraryAutoMapperProfile) using [DI example by Jan de Vries][11]
+- [x] ~~Add AppVeyor build tag~~
+- [x] ~~Write comments to own file~~
+- [x] ~~Convert post and comment HTML to Markdown~~
+- [x] ~~Add banner-property to Hugo-markdown based on Wordpress postmeta-key "_thumbnail_id"~~
+- [x] ~~Save blogs in [Page Resources/Bundles][9] instead of all .md files in one directory~~
+- [x] ~~Parse gallery-tag in post-content into page-resources (specified in the header)~~ 
 
 [1]: https://wordpress.com/
 [2]: https://en.support.wordpress.com/export/
