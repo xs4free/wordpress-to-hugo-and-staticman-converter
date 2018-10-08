@@ -52,7 +52,7 @@ namespace ConverterLibrary.Converters
                             Title = attachment.Title,
                             Params = new ResourceParams
                             {
-                                ImageGallery = true
+                                Imagegallery = true
                             }
                         });
                     }
