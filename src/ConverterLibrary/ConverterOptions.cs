@@ -6,5 +6,6 @@
         public string OutputDirectory { get; set; }
         public string[] UploadDirectories { get; set; }
         public bool PageResources { get; set; }
+        public string ImageShortCode { get; set; }
     }
 }

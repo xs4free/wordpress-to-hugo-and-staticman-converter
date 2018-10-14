@@ -21,6 +21,11 @@ namespace ConverterLibrary.Extensions
             return url;
         }
 
+        public static string CleanUrl(this string url)
+        {
+            return url.Replace(" ", "-").Replace("%20", "-");
+        }
+
         public static string RemoveFirstBackslash(this string path)
         {
             string result = path;
@@ -36,14 +41,22 @@ namespace ConverterLibrary.Extensions
         // https://stackoverflow.com/questions/372865/path-combine-for-urls
         public static string CombineUri(this string baseUri, params string[] uriParts)
         {
-            string uri = string.Empty;
+            string uri = baseUri;
+
             if (uriParts != null && uriParts.Any())
             {
                 char[] trims = { '\\', '/' };
                 uri = (baseUri ?? string.Empty).TrimEnd(trims);
                 foreach (var part in uriParts)
                 {
-                    uri = string.Format("{0}/{1}", uri.TrimEnd(trims), (part ?? string.Empty).TrimStart(trims));
+                    if (uri.Length == 0)
+                    {
+                        uri = (part ?? string.Empty).TrimStart(trims);
+                    }
+                    else
+                    {
+                        uri = string.Format("{0}/{1}", uri.TrimEnd(trims), (part ?? string.Empty).TrimStart(trims));
+                    }
                 }
             }
             return uri;

@@ -13,7 +13,8 @@ namespace wordpress_to_hugo_and_staticman_converter
                 .ForMember(dest => dest.OutputDirectory,
                     opt => opt.MapFrom(src => Path.GetFullPath(src.OutputDirectory)))
                 .ForMember(dest => dest.UploadDirectories, opt => opt.MapFrom(src => src.UploadDirectories))
-                .ForMember(dest => dest.PageResources, opt => opt.MapFrom(src => src.PageResources));
+                .ForMember(dest => dest.PageResources, opt => opt.MapFrom(src => src.PageResources))
+                .ForMember(dest => dest.ImageShortCode, opt => opt.MapFrom(src => src.ImageShortCode));
         }
     }
 }

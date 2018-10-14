@@ -48,6 +48,17 @@ namespace ConverterLibrary
                 _logger.LogInformation("Hugo page resources will be created.");
             }
 
+            if (!string.IsNullOrEmpty(options.ImageShortCode))
+            {
+                if (!options.PageResources)
+                {
+                    _logger.LogError("Shortcode for images can only be used when generating Page Resources as well.");
+                    return;
+                }
+
+                _logger.LogInformation($"Using shortcode for images: {options.ImageShortCode}");
+            }
+
             if (ValidateOptions(options))
             {
                 _logger.LogInformation($"Start processing '{options.InputFile}'...");
@@ -77,7 +88,6 @@ namespace ConverterLibrary
 
             foreach (var hugoPost in hugoPosts)
             {
-                string postRelativeDirectory = Path.GetDirectoryName(hugoPost.Filename);
                 string outputDirectory = hugoPost.Metadata.Type == "page"
                     ? options.OutputDirectory
                     : Path.Combine(options.OutputDirectory, HugoContentDirectoryName);
@@ -85,10 +95,10 @@ namespace ConverterLibrary
                 string postFullDirectory = Path.GetDirectoryName(postFileName);
                 Directory.CreateDirectory(postFullDirectory);
 
-                string imageBaseUrl = options.PageResources ? $"/{postRelativeDirectory.PathToUrl()}" : GetImageBaseUrl(hugoPost, "/uploads");
-                var replacedImages = _imageReplacer.Replace(hugoPost, content.Channel.Link, imageBaseUrl);
+                string imageBaseUrl = options.PageResources ? null : GetImageBaseUrl(hugoPost, "/uploads");
+                var replacedImages = _imageReplacer.Replace(hugoPost, content.Channel.Link, imageBaseUrl, options.ImageShortCode);
 
-                CopyReplacedImagesToOutputDirectory(options, replacedImages);
+                CopyReplacedImagesToOutputDirectory(options, replacedImages, postFullDirectory);
 
                 var yaml = _yamlSerializer.Serialize(hugoPost.Metadata);
 
@@ -103,7 +113,7 @@ namespace ConverterLibrary
             }
         }
 
-        private void CopyReplacedImagesToOutputDirectory(ConverterOptions options, IEnumerable<ImageReplacerResult> replacedImages)
+        private void CopyReplacedImagesToOutputDirectory(ConverterOptions options, IEnumerable<ImageReplacerResult> replacedImages, string postFullDirectory)
         {
             if (options.UploadDirectories != null && options.UploadDirectories.Any())
             {
@@ -116,7 +126,7 @@ namespace ConverterLibrary
                     {
                         string originalImage = Path.Combine(uploadDirectory, replacedImage.OriginalRelativeUrl.UrlToPath().RemoveFirstBackslash());
                         string outputDirectory = Path.Combine(options.OutputDirectory, options.PageResources ? HugoContentDirectoryName : HugoStaticDirectoryName);
-                        string newImageLocation = Path.Combine(outputDirectory, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
+                        string newImageLocation = Path.Combine(options.PageResources ? postFullDirectory : outputDirectory, replacedImage.NewRelativeUrl.UrlToPath().RemoveFirstBackslash());
 
                         if (File.Exists(originalImage))
                         {

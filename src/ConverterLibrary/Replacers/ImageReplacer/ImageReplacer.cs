@@ -17,11 +17,11 @@ namespace ConverterLibrary.Replacers.ImageReplacer
         private static readonly string _patternMarkdownImages = "\\!\\[(?<alt>.*?)\\]\\((?<url>.*?)(\"+(?<title>.*?)\"+)*\\)";
         private readonly Regex _regexMarkdownImages = new Regex(_patternMarkdownImages, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public IEnumerable<ImageReplacerResult> Replace(Post hugoPost, string siteUrl, string imageBaseUrl)
+        public IEnumerable<ImageReplacerResult> Replace(Post hugoPost, string siteUrl, string imageBaseUrl, string imageShortCode = null)
         {
             List<ImageReplacerResult> replacedImageResults = new List<ImageReplacerResult>();
 
-            ReplaceImageLinksInContent(siteUrl, imageBaseUrl, hugoPost, replacedImageResults);
+            ReplaceImageLinksInContent(siteUrl, imageBaseUrl, hugoPost, replacedImageResults, imageShortCode);
             ReplaceLinksToImagesInContent(siteUrl, replacedImageResults, hugoPost);
             ReplaceImageLinksInResources(imageBaseUrl, hugoPost, replacedImageResults);
 
@@ -66,7 +66,7 @@ namespace ConverterLibrary.Replacers.ImageReplacer
         }
 
         private void ReplaceImageLinksInContent(string siteUrl, string imageBaseUrl, Post hugoPost,
-            List<ImageReplacerResult> replacedImageResults)
+            List<ImageReplacerResult> replacedImageResults, string imageShortCode)
         {
             var resources = new List<Resource>();
 
@@ -76,7 +76,7 @@ namespace ConverterLibrary.Replacers.ImageReplacer
                 string alt = m.Groups["alt"].Value;
                 string url = m.Groups["url"].Value;
 
-                string newImgTag = GetNewImgTag(title, alt, url, siteUrl, imageBaseUrl, out string originalRelativeUrl,
+                string newImgTag = GetNewImgTag(title, alt, url, siteUrl, imageBaseUrl, imageShortCode, out string originalRelativeUrl, 
                     out string newRelativeUrl);
 
                 resources.Add(CreateResource(newRelativeUrl, title, alt));
@@ -111,12 +111,12 @@ namespace ConverterLibrary.Replacers.ImageReplacer
         {
             return new Resource
             {
-                Src = newRelativeUrl,
+                Src = newRelativeUrl.Split('/', StringSplitOptions.RemoveEmptyEntries).Last(),
                 Title = string.IsNullOrEmpty(title) ? string.IsNullOrEmpty(alt) ? null : alt : title
             };
         }
 
-        private string GetNewImgTag(string title, string alt, string imageUrl, string siteUrl, string imageBaseUrl, out string originalRelativeUrl, out string newRelativeUrl)
+        private string GetNewImgTag(string title, string alt, string imageUrl, string siteUrl, string imageBaseUrl, string shortCode, out string originalRelativeUrl, out string newRelativeUrl)
         {
             string titleTag = string.IsNullOrEmpty(title) ? string.Empty : $" \"{title}\"";
             string newImgTag = $"![{alt}]({imageUrl}{titleTag})";
@@ -132,9 +132,18 @@ namespace ConverterLibrary.Replacers.ImageReplacer
 
                 if (siteUri.Host == imageUri.Host)
                 {
-                    newRelativeUrl = imageBaseUrl.CombineUri(imageUri.Segments.Last());
+                    string imageFilename = imageUri.Segments.Last().CleanUrl();
+                    newRelativeUrl = imageBaseUrl.CombineUri(imageFilename);
 
-                    newImgTag = $"![{alt}]({newRelativeUrl}{titleTag})";
+                    if (string.IsNullOrEmpty(shortCode))
+                    {
+                        newImgTag = $"![{alt}]({newRelativeUrl}{titleTag})";
+                    }
+                    else
+                    {
+                        string formattedShortCode = string.Format(shortCode, imageFilename, title, alt);
+                        newImgTag = string.Format("{{{{< {0} >}}}}", formattedShortCode);
+                    }
                 }
             }
 
