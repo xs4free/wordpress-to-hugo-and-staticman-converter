@@ -32,6 +32,7 @@ namespace ConverterLibrary
                 .ForMember(metadata => metadata.Draft, opt => opt.MapFrom(item => item.Status == "draft" || item.Status == "pending" || item.Status == "private"))
                 .ForMember(metadata => metadata.Private, opt => opt.MapFrom(item => item.Status == "private"))
                 .ForMember(metadata => metadata.Url, opt => opt.ResolveUsing((item, metadata, x, context) => GetPermaLink(item, context.GetSiteUrl()))) 
+                .ForMember(metadata => metadata.CommentFolder, opt => opt.ResolveUsing((item, metadata, x, context) => GetCommentFolder(item)))
                 .ForMember(metadata => metadata.Date, opt => opt.MapFrom(item => GetDate(item)))
                 .ForMember(metadata => metadata.Categories, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "category")))
                 .ForMember(metadata => metadata.Tags, opt => opt.MapFrom(item => item.Categories.Where(cat => cat.Domain == "post_tag")))
@@ -90,15 +91,26 @@ namespace ConverterLibrary
             return wordpressPost.PostDateGmt.Value.ToString(HugoDateTimeFormat, CultureInfo.InvariantCulture);
         }
 
-        private string GetFileName(Item wordpressPost, bool usePageResources)
+        private string GetCommentFolder(Item wordPressPost)
         {
-            string decodedPostName = string.IsNullOrEmpty(wordpressPost.PostName)
-                ? WebUtility.UrlDecode(wordpressPost.Title.Replace(" ", "-").ToLowerInvariant())
-                : WebUtility.UrlDecode(wordpressPost.PostName);
+            string decodedPostName = string.IsNullOrEmpty(wordPressPost.PostName)
+                ? WebUtility.UrlDecode(wordPressPost.Title.Replace(" ", "-").ToLowerInvariant())
+                : WebUtility.UrlDecode(wordPressPost.PostName);
 
-            string fileName = wordpressPost.PostType == "page"
-                ? $"{decodedPostName}\\index.md"
-                : $"{wordpressPost.PostDateGmt.Value:yyyy-MM-dd}-{decodedPostName}{ (usePageResources ? "\\index" : "")}.md";
+            string commentFolder = wordPressPost.PostType == "page"
+                ? $"{decodedPostName}"
+                : $"{wordPressPost.PostDateGmt.Value:yyyy-MM-dd}-{decodedPostName}";
+
+            return commentFolder;
+        }
+
+        private string GetFileName(Item wordPressPost, bool usePageResources)
+        {
+            string commentFolder = GetCommentFolder(wordPressPost);
+
+            string fileName = wordPressPost.PostType == "page"
+                ? $"{commentFolder}\\index.md"
+                : $"{commentFolder}{ (usePageResources ? "\\index" : "")}.md";
 
             return fileName;
         }
