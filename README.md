@@ -1,6 +1,6 @@
 # wordpress-to-hugo-and-staticman-converter
 Convert a [WordPress][1] [xml export][2] to [Hugo][3] posts and [Staticman][4] comment-files.
-[![Build status](https://ci.appveyor.com/api/projects/status/pyrjhl3ltq4e4owd?svg=true)](https://ci.appveyor.com/project/xs4free/wordpress-to-hugo-and-staticman-converter)
+[![Build Status](https://xs4free.visualstudio.com/WordPress%20to%20Hugo%20and%20Staticman%20converter/_apis/build/status/WordPress-to-Hugo-converter-CI)](https://xs4free.visualstudio.com/WordPress%20to%20Hugo%20and%20Staticman%20converter/_build/latest?definitionId=1)
 
 # How to run
 ## Commandline options
@@ -23,7 +23,6 @@ Based my code on [wordpress-to-hugo-exporter][5] from [Cyrill Schumacher][6] whi
 Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-mail Notifications][7] by [Dan C Williams][8]. 
 
 # TODO
-- [ ] Build using [Microsoft Azure DevOps][10] instead of AppVeyor
 - [ ] Parse caption-tag in post-content; convert to figcaption
 - [ ] Replace '<span style="font-size: 13.3333px;">e</span>' in text with Markdown unrelated to font-size
 - [ ] Rename WordpressWXR12 library to WordPressWXR12 
@@ -42,6 +41,7 @@ Added staticman comments files based on [Hugo + Staticman: Nested Replies and E-
 - [x] ~~Fix spaces in image names bacause Hugo crashes when these are used in Page Resources~~
 - [x] ~~Check location of images when not using shortcode~~
 - [x] ~~Check location of images when not using Page Resources~~
+- [x] ~~Build using [Microsoft Azure DevOps][10] instead of AppVeyor~~
 
 [1]: https://wordpress.com/
 [2]: https://en.support.wordpress.com/export/
