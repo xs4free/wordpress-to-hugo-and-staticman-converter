@@ -12,8 +12,8 @@ Short | Long | Description
 -c | --content           |Location(s) of wp-contents folder(s) where images from WordPress can be found.
 -p | --pageresources     |Use page resources as location to store images (instead of 'uploads' folder).
 -s | --shortcodeimage    |Hugo Shortcode used for rendering images in front-matter. If not specified a Markdown image tag will be used.
-- | --help                |Display help screen.
-- |--version              |Display version information.
+<no short> | --help                |Display help screen.
+<no short> | --version              |Display version information.
 
 ## Example
 `dotnet wordpress-to-hugo-and-staticman-converter.dll -i "..\blogname.wordpress.2018-08-01.xml" -o "..\Output" -c "..\wp-content","..\wp-content\weblog" -pageresources -s "img \"{0}\" \"{1}\"  \"{2}\""`
