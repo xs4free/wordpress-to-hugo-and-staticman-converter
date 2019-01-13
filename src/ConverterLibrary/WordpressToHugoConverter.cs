@@ -178,9 +178,16 @@ namespace ConverterLibrary
             var posts = content.Channel.Items.Where(item => item.PostType == "post" || item.PostType == "page").ToList();
             var staticmanComments = posts.SelectMany(post => _mapper.Map<IEnumerable<HugoModels.Comment>>(post));
 
+            var knownCommenters = new HashSet<string>();
             var commentsDirectory = Directory.CreateDirectory(Path.Combine(options.OutputDirectory, "data\\comments"));
             foreach (var comment in staticmanComments)
             {
+                string knownCommenter = $"{comment.Metadata.Email},{comment.Metadata.Name.ToLowerInvariant()}";
+                if (!knownCommenters.Contains(knownCommenter))
+                {
+                    knownCommenters.Add(knownCommenter);
+                }
+
                 string directory = Path.GetDirectoryName(comment.FileName);
                 string fileName;
                 if (string.IsNullOrEmpty(directory))
@@ -198,6 +205,15 @@ namespace ConverterLibrary
                 File.WriteAllText(fileName, yaml, Encoding.UTF8);
                 _logger.LogInformation($"Written '{fileName}'.");
             }
+
+            string filename = Path.Combine(commentsDirectory.FullName, "known-commenters.csv");
+            StringBuilder knownCommentersCsvContent = new StringBuilder();
+            foreach (var knownCommenter in knownCommenters)
+            {
+                knownCommentersCsvContent.AppendLine(knownCommenter);
+            }
+
+            File.WriteAllText(filename, knownCommentersCsvContent.ToString(), Encoding.UTF8);
         }
 
         private void WriteConfig(RSS content, ConverterOptions options)
